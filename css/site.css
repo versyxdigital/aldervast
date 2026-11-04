@@ -427,6 +427,8 @@ footer .fine { margin-top: 36px; padding-top: 18px; border-top: 1px solid var(--
 
 .kv { display: flex; flex-wrap: wrap; gap: 6px 18px; color: var(--muted); font-size: 0.92rem; }
 .kv b { color: var(--ink); font-weight: 700; }
+.kv .kv-skill { flex-basis: 100%; display: flex; align-items: center; gap: 8px; margin-top: 2px; }
+.kv .kv-skill img { border-radius: 6px; box-shadow: 0 0 0 1px var(--line-2); }
 
 .center { text-align: center; }
 .mt { margin-top: 28px; }
@@ -455,3 +457,4 @@ td.nm .tico { width: 36px; height: 36px; padding: 2px; border-radius: 6px; verti
 @media (max-width: 560px) { .icon-strip { margin-top: -30px; } .itile { width: 58px; height: 58px; } }
 .entry .ico.u { border-color: color-mix(in srgb, var(--unique) 65%, transparent); }
 .entry .ico.s { border-color: color-mix(in srgb, var(--set) 65%, transparent); }
+.entry-head.has-ico h3 { flex: 1 1 200px; min-width: 0; }
