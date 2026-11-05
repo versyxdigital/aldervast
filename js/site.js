@@ -175,7 +175,7 @@
       });
       $$(".group-block", scope).forEach(function (g) {
         var any = $$(".entry:not(.hide), tbody tr[data-q]", g).some(function (el) { return el.style.display !== "none" && !el.classList.contains("hide"); });
-        g.style.display = any ? "" : "none";
+        g.style.display = any || (!q && g.hasAttribute("data-keep")) ? "" : "none";   // data-keep: a table block with no entries
       });
       if (count) count.textContent = q ? n + " shown" : items.length + " entries";
     };
@@ -227,4 +227,15 @@
     });
     var qs = new URLSearchParams(location.search).get("q"); if (qs) { sb.value = qs; run2(); }
   }
+})();
+
+// Hourglass omens (0.85.0): mark this week's row of the rotation. Weeks start Monday 00:00 UTC, as in
+// core/endgame/hourglass_rules.gd week_of(): floor((unix + 3 days) / 1 week), then mod the rotation's length.
+(function () {
+  var t = document.querySelector('[data-hg-rot]');
+  if (!t) return;
+  var n = parseInt(t.getAttribute('data-hg-rot'), 10) || 1;
+  var wk = Math.floor((Date.now() / 1000 + 3 * 86400) / 604800);
+  var row = t.querySelector('[data-wk="' + (((wk % n) + n) % n) + '"]');
+  if (row) row.classList.add('now');
 })();
