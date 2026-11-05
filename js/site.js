@@ -210,7 +210,7 @@
         hits = hits.slice(0, 30); selIdx = -1;
         res.innerHTML = hits.length ? hits.map(function (h) {
           var e = h[1], t = esc(e.n) + "<em>" + esc(e.c) + "</em><small>" + esc(e.s) + "</small>";
-          if (e.i) return '<li><a class="r-ico" href="' + ROOT + esc(e.u) + '"><img class="rico" src="' + ROOT + "assets/icons/" + esc(e.i) + '.webp" alt="" width="38" height="38"><span>' + t + "</span></a></li>";
+          if (e.i) return '<li><a class="r-ico" href="' + ROOT + esc(e.u) + '"><img class="rico' + (e.i.indexOf("passive_") === 0 ? " r" : "") + '" src="' + ROOT + "assets/icons/" + esc(e.i) + '.webp" alt="" width="38" height="38"><span>' + t + "</span></a></li>";
           return '<li><a href="' + ROOT + esc(e.u) + '">' + t + "</a></li>";
         }).join("") : '<li class="none">Nothing matches that yet.</li>';
         res.classList.add("on");
