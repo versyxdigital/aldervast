@@ -486,3 +486,19 @@ h4.emb-h { margin: 22px 0 8px; }
 tr.now td { background: rgba(214, 170, 90, 0.1); }
 tr.now .now-tag { display: inline-block; }
 .thumbs.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+/* Wide strip renders (0.93.0 effects): two to a row at their own shape, one to a row on phones */
+.thumbs.strips { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+.thumbs.strips figure { aspect-ratio: auto; }
+.thumbs.strips img { height: auto; display: block; }
+@media (max-width: 640px) { .thumbs.strips { grid-template-columns: 1fr; } }
+.thumbs.strips.one { grid-template-columns: 1fr; }
+@media (max-width: 640px) { .thumbs.dense { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* Key caps and How to play lists (0.94.0, the Getting started page) */
+kbd { display: inline-block; min-width: 1.7em; padding: 0 6px; margin: 0 1px; border-radius: 4px; background: #6a5130; color: #fff1cc; font: 700 0.86em/1.55 var(--body); text-align: center; border: 1px solid rgba(242, 217, 150, 0.35); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.5); white-space: nowrap; vertical-align: 0.05em; }
+ul.how { list-style: none; padding: 0; margin: 6px 0 10px; }
+ul.how li { position: relative; padding-left: 20px; margin: 6px 0; }
+ul.how li::before { content: "\25C6"; position: absolute; left: 0; top: 0.2em; color: var(--gold-deep); font-size: 0.78em; }
+table.keys th { text-align: left; color: var(--gold); font: 600 0.95rem var(--display); letter-spacing: 0.04em; padding-top: 14px; }
+table.keys td:first-child { color: var(--ink-2); }
