@@ -486,6 +486,8 @@ h4.emb-h { margin: 22px 0 8px; }
 tr.now td { background: rgba(214, 170, 90, 0.1); }
 tr.now .now-tag { display: inline-block; }
 .thumbs.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.thumbs.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 640px) { .thumbs.three { grid-template-columns: 1fr; } }
 
 /* Wide strip renders (0.93.0 effects): two to a row at their own shape, one to a row on phones */
 .thumbs.strips { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
