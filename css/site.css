@@ -504,3 +504,10 @@ ul.how li { position: relative; padding-left: 20px; margin: 6px 0; }
 ul.how li::before { content: "\25C6"; position: absolute; left: 0; top: 0.2em; color: var(--gold-deep); font-size: 0.78em; }
 table.keys th { text-align: left; color: var(--gold); font: 600 0.95rem var(--display); letter-spacing: 0.04em; padding-top: 14px; }
 table.keys td:first-child { color: var(--ink-2); }
+/* 1.14.31 guides: the story step by step, with where to go */
+ol.walk { margin: 10px 0; padding-left: 1.6em; color: var(--ink-2); }
+ol.walk > li { margin: 0 0 16px; padding-left: 4px; }
+ol.walk > li::marker { color: var(--gold); font-family: var(--display); }
+ol.walk > li > p { margin: 4px 0; }
+ol.walk ul.plain { margin: 4px 0; }
+.entry { min-width: 0; }   /* a wide table scrolls in its entry, not the page on a phone */
