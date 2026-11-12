@@ -677,14 +677,22 @@ ol.walk ul.plain { margin: 4px 0; }
 .lore-panel { padding: clamp(26px, 4vw, 40px); }
 
 /* ---------- Downloads (2026-11-12) ---------- */
-pre.code { margin: 14px 0 18px; padding: 14px 16px; border-radius: 10px; background: rgba(4, 10, 24, 0.78); border: 1px solid rgba(159, 220, 255, 0.22); overflow-x: auto; font: 0.86rem/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: #dbeeff; white-space: pre; }
+pre.code { margin: 12px 0 16px; padding: 12px 14px; border-radius: 10px; background: rgba(4, 10, 24, 0.78); border: 1px solid rgba(159, 220, 255, 0.22); overflow-x: auto; font: 0.84rem/1.6 Consolas, "SFMono-Regular", Menlo, "Liberation Mono", monospace; color: #dbeeff; white-space: pre; max-width: 100%; }
 pre.code code { font: inherit; color: inherit; background: none; padding: 0; }
-.guide code, .dl-card code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.88em; color: var(--crystal-2); overflow-wrap: anywhere; }
+.guide code, .dl-card .path { font-family: Consolas, "SFMono-Regular", Menlo, "Liberation Mono", monospace; font-size: 0.86em; color: var(--crystal-2); overflow-wrap: anywhere; word-break: break-word; }
 .guide h3 { margin-top: 34px; color: var(--gold-2); }
 .guide ul, .guide ol, .dl-steps { padding-left: 1.3em; }
 .guide li, .dl-steps li { margin: 6px 0; }
-.dl-main { max-width: 860px; margin: 0 auto; }
+.dl-card { display: flex; min-width: 0; }
+.dl-card .body { display: flex; flex-direction: column; width: 100%; min-width: 0; }
+.dl-card .dl-how { flex: 1; min-width: 0; }
 .dl-sub { color: var(--ink-2); }
-.dl-btns { justify-content: flex-start; margin: 18px 0 8px; }
-.dl-file { margin-top: 16px; font-size: 0.8rem; color: var(--ink-2); overflow-wrap: anywhere; }
-.dl-file span { color: var(--ink); }
+.dl-btns { justify-content: flex-start; margin: 16px 0 10px; gap: 10px; }
+.dl-btns .btn small { font-size: 0.72rem; opacity: 0.75; letter-spacing: 0.08em; }
+.dl-note { font-size: 0.92rem; color: var(--ink-2); }
+.dl-sums { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(159, 220, 255, 0.16); font-size: 0.8rem; color: var(--ink-2); }
+.dl-sums summary { cursor: pointer; color: var(--crystal-2); }
+.dl-sums ul { list-style: none; padding: 0; margin: 10px 0 0; }
+.dl-sums li { margin: 0 0 10px; }
+.dl-sums span { display: block; color: var(--ink); }
+.dl-sums code { display: block; font: 0.76rem/1.5 Consolas, "SFMono-Regular", Menlo, "Liberation Mono", monospace; word-break: break-all; color: var(--ink-2); }
