@@ -1,0 +1,155 @@
+#!/usr/bin/env bash
+# Update the Aldervast dedicated server on the VPS.
+#
+#   cd /tmp && wget https://github.com/versyxdigital/aldervast/releases/download/v1.14.41/Aldervast-1.14.41-server-linux.zip
+#   ~/update-aldervast-server --version=1.14.41
+#
+# Looks for /tmp/Aldervast-<ver>-server-linux.zip (or its .part* pieces, which it joins),
+# also in your home folder. It checks the new build BEFORE stopping the server, keeps a dated
+# copy of the saves, keeps the old program as server-prev, and puts the old program back if
+# the new one does not stay running.
+#
+# Options:
+#   --version=X.Y.Z   required
+#   --zip=PATH        use this zip instead of searching /tmp and ~
+#   --keep-zip        don't delete the zip/pieces afterwards
+#   -h, --help
+set -euo pipefail
+
+SERVICE=aldervast
+AV_USER=aldervast
+AV_HOME=${ALDERVAST_HOME:-/home/aldervast}
+SERVER_DIR="$AV_HOME/server"
+PREV_DIR="$AV_HOME/server-prev"
+DATA_DIR="$AV_HOME/data"
+BINARY=aldervast_server.x86_64
+SETTLE_SECS=${SETTLE_SECS:-10}
+
+VERSION="" ZIP="" KEEP_ZIP=0
+usage() { sed -n '2,18p' "$0" | sed 's/^# \{0,1\}//'; }
+die()  { echo "ERROR: $*" >&2; exit 1; }
+say()  { echo "==> $*"; }
+
+for arg in "$@"; do
+  case "$arg" in
+    --version=*) VERSION="${arg#*=}" ;;
+    --zip=*)     ZIP="${arg#*=}" ;;
+    --keep-zip)  KEEP_ZIP=1 ;;
+    -h|--help)   usage; exit 0 ;;
+    *) usage; die "unknown option: $arg" ;;
+  esac
+done
+[[ -n "$VERSION" ]] || { usage; die "--version=X.Y.Z is required"; }
+[[ "$VERSION" =~ ^[0-9]+(\.[0-9]+){1,3}$ ]] || die "version '$VERSION' doesn't look like 1.14.33"
+
+# Run everything as root (asks for your sudo password once).
+if [[ $EUID -ne 0 ]]; then
+  exec sudo "$(readlink -f "$0")" "$@"
+fi
+CALLER_HOME=""
+[[ -n "${SUDO_USER:-}" ]] && CALLER_HOME=$(getent passwd "$SUDO_USER" | cut -d: -f6)
+
+command -v unzip >/dev/null || die "unzip is not installed (sudo apt install unzip)"
+id "$AV_USER" >/dev/null 2>&1 || die "user '$AV_USER' does not exist"
+
+# ---- 1. find (or join) the zip -------------------------------------------------------------
+NAME="Aldervast-$VERSION-server-linux.zip"
+JOINED=""          # set if we built the zip from pieces (so we delete it too)
+PARTS=()
+if [[ -z "$ZIP" ]]; then
+  for d in /tmp "${CALLER_HOME:-}" ; do
+    [[ -n "$d" ]] || continue
+    if [[ -f "$d/$NAME" ]]; then ZIP="$d/$NAME"; break; fi
+    mapfile -t PARTS < <(ls -1 "$d/$NAME".part* 2>/dev/null | sort -V || true)
+    if (( ${#PARTS[@]} )); then
+      say "Joining ${#PARTS[@]} pieces from $d"
+      ZIP="/tmp/$NAME"; JOINED="$ZIP"
+      cat "${PARTS[@]}" > "$ZIP"
+      break
+    fi
+  done
+fi
+[[ -n "$ZIP" && -f "$ZIP" ]] || die "can't find $NAME (or $NAME.part*) in /tmp or ${CALLER_HOME:-~}. scp it to /tmp first."
+say "Using $ZIP ($(du -h "$ZIP" | cut -f1))"
+
+# ---- 2. check and unpack the new build while the old one is still running -------------------
+unzip -tq "$ZIP" >/dev/null || die "$ZIP is damaged (unzip -t failed). Copy it again."
+STAGE=$(mktemp -d "$AV_HOME/.update-$VERSION.XXXXXX")
+cleanup_stage() { rm -rf "$STAGE"; }
+trap cleanup_stage EXIT
+unzip -q "$ZIP" -d "$STAGE"
+NEW="$STAGE/server-linux"
+[[ -d "$NEW" ]] || die "the zip has no server-linux/ folder (found: $(ls "$STAGE" | tr '\n' ' '))"
+[[ -f "$NEW/$BINARY" ]] || die "server-linux/$BINARY is missing from the zip"
+chmod +x "$NEW/$BINARY"
+file "$NEW/$BINARY" 2>/dev/null | grep -q 'x86-64' || echo "    (warning: couldn't confirm $BINARY is an x86-64 program)"
+say "New build $VERSION checked"
+
+# ---- 3. stop the server (its ExecStop saves everything via the stop file) -------------------
+if systemctl is-active --quiet "$SERVICE"; then
+  say "Stopping $SERVICE (saves first, up to 60 s)"
+  systemctl stop "$SERVICE"
+fi
+systemctl is-active --quiet "$SERVICE" && die "$SERVICE is still running; nothing was changed"
+
+# ---- 4. safety copy of the saves ------------------------------------------------------------
+if [[ -d "$DATA_DIR" ]]; then
+  BACKUP="$AV_HOME/data-before-$VERSION"
+  [[ -e "$BACKUP" ]] && BACKUP="$BACKUP-$(date +%Y%m%d-%H%M%S)"
+  cp -a "$DATA_DIR" "$BACKUP"
+  say "Saves copied to $BACKUP"
+else
+  BACKUP=""
+  echo "    (no $DATA_DIR yet; nothing to back up)"
+fi
+
+# ---- 5. swap the program, keeping the old one as server-prev --------------------------------
+rm -rf "$PREV_DIR"
+[[ -d "$SERVER_DIR" ]] && mv "$SERVER_DIR" "$PREV_DIR"
+mv "$NEW" "$SERVER_DIR"
+echo "$VERSION" > "$SERVER_DIR/VERSION"
+chown -R "$AV_USER:$AV_USER" "$AV_HOME"
+
+# ---- 6. start and make sure it stays up -----------------------------------------------------
+started_ok() {
+  local before after
+  before=$(systemctl show -p NRestarts --value "$SERVICE" 2>/dev/null || echo 0)
+  systemctl start "$SERVICE" || return 1
+  sleep "$SETTLE_SECS"
+  after=$(systemctl show -p NRestarts --value "$SERVICE" 2>/dev/null || echo 0)
+  systemctl is-active --quiet "$SERVICE" && [[ "$after" == "$before" ]]
+}
+
+say "Starting $SERVICE $VERSION (checking it stays up for ${SETTLE_SECS} s)"
+if started_ok; then
+  say "$SERVICE $VERSION is running"
+  systemctl --no-pager --lines=0 status "$SERVICE" | head -n 3 || true
+else
+  echo "!!! $VERSION did not stay running. Last log lines:" >&2
+  journalctl -u "$SERVICE" -n 25 --no-pager >&2 || true
+  systemctl stop "$SERVICE" || true
+  if [[ -d "$PREV_DIR" ]]; then
+    say "Rolling back to the previous program"
+    rm -rf "$SERVER_DIR"
+    mv "$PREV_DIR" "$SERVER_DIR"
+    chown -R "$AV_USER:$AV_USER" "$SERVER_DIR"
+    if started_ok; then
+      say "Previous version ($(cat "$SERVER_DIR/VERSION" 2>/dev/null || echo old)) is running again"
+    else
+      echo "!!! The previous version did not start either. Check: journalctl -u $SERVICE -n 50" >&2
+    fi
+  fi
+  [[ -n "$BACKUP" ]] && echo "Saves from before the update are in $BACKUP (copy back with the server stopped if needed)." >&2
+  echo "The zip was left in place." >&2
+  exit 1
+fi
+
+# ---- 7. tidy up ----------------------------------------------------------------------------
+if (( ! KEEP_ZIP )); then
+  rm -f "$ZIP" ${JOINED:+"$JOINED"}
+  (( ${#PARTS[@]} )) && rm -f "${PARTS[@]}"
+  say "Removed the uploaded zip"
+fi
+echo
+echo "Done. Old program kept in $PREV_DIR${BACKUP:+, saves backup in $BACKUP}."
+echo "Old data-before-* copies are not deleted automatically: ls -d $AV_HOME/data-before-*"

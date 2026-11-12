@@ -1,0 +1,20 @@
+[Unit]
+Description=Aldervast dedicated server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=aldervast
+Group=aldervast
+WorkingDirectory=/home/aldervast/server
+ExecStartPre=/bin/rm -f /home/aldervast/stop
+ExecStart=/home/aldervast/server/aldervast_server.x86_64 --headless -- --port=24650 --data-dir=/home/aldervast/data --max-players=64 --stop-file=/home/aldervast/stop
+# graceful stop: the server saves everything and exits when this file appears
+ExecStop=/bin/sh -c 'touch /home/aldervast/stop; while kill -0 $MAINPID 2>/dev/null; do sleep 0.5; done'
+TimeoutStopSec=60
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
