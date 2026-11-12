@@ -16,7 +16,7 @@
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preload" href="assets/fonts/Cinzel.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/AlegreyaSans-Regular.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="css/site.css?v=51efca79">
+<link rel="stylesheet" href="css/site.css?v=ee2ceb1f">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -24,7 +24,7 @@
   <div class="wrap">
     <a class="brand" href="index.html"><i class="mark" aria-hidden="true"></i><span>ALDERVAST</span></a>
     <button class="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-links"><span></span><span></span><span></span></button>
-    <ul class="nav-links" id="nav-links"><li><a href="index.html">Home</a></li><li><a href="world.html">The World</a></li><li><a href="heroes.html">Heroes</a></li><li><a href="play.html">How it plays</a></li><li><a href="gallery.html">Gallery</a></li><li><a href="wiki/index.html">Wiki</a></li><li><a href="changelog.html">Releases</a></li><li><a href="download.html" aria-current="page">Download</a></li></ul>
+    <ul class="nav-links" id="nav-links"><li><a href="index.html">Home</a></li><li><a href="world.html">The World</a></li><li><a href="heroes.html">Heroes</a></li><li><a href="play.html">How it plays</a></li><li><a href="gallery.html">Gallery</a></li><li><a href="wiki/index.html">Wiki</a></li><li><a href="changelog.html">Releases</a></li><li><a href="servers.html">Servers</a></li><li><a href="download.html" aria-current="page">Download</a></li></ul>
   </div>
 </header>
 <main id="main">
@@ -40,7 +40,7 @@ cd Aldervast
 </section>
 <section class="section band" id="server">
   <div class="wrap">
-    <div class="section-head reveal"><span class="eyebrow">Dedicated server</span><h2>Keep a world running</h2><p>Single Player and Host a Game need nothing extra. A dedicated server keeps the world up when you are not playing; it runs the same code as the game, and a client joins it with <b>Join a Server</b>.</p></div>
+    <div class="section-head reveal"><span class="eyebrow">Dedicated server</span><h2>Keep a world running</h2><p>Want to play online now? Join the <a href="servers.html">Alpha Server</a>. Single Player and Host a Game need nothing extra. A dedicated server keeps the world up when you are not playing; it runs the same code as the game, and a client joins it with <b>Join a Server</b>.</p></div>
     <div class="grid g2"><div class="card dl-card reveal" id="get-server-linux"><div class="body"><h3>Dedicated server for Linux</h3><p class="dl-sub">A headless server for an x86_64 Linux machine or VPS. The <a href="#vps">VPS guide</a> below sets it up as a service.</p><div class="btns dl-btns"><a class="btn" href="https://github.com/versyxdigital/aldervast/releases/download/v1.14.41/Aldervast-1.14.41-server-linux.zip">Download <small>39 MB</small></a></div><div class="dl-how"><ol class="dl-steps"><li>Unzip it and start the server:</li></ol><pre class="code"><code>unzip Aldervast-1.14.41-server-linux.zip
 cd server-linux
 ./start_server.sh</code></pre><ol class="dl-steps" start="2"><li>Let UDP port 24650 in, and friends join with <b>Join a Server</b>.</li></ol></div><details class="dl-sums"><summary>Check the download (SHA-256)</summary><ul><li><span>Aldervast-1.14.41-server-linux.zip</span><code>4ce0c3680f80dde516e581a21c3bcfac52d597707c6232ae49507b49b72eb032</code></li></ul></details></div></div><div class="card dl-card reveal" id="get-server-windows"><div class="body"><h3>Dedicated server for Windows</h3><p class="dl-sub">The same server for a Windows PC that stays on.</p><div class="btns dl-btns"><a class="btn" href="https://github.com/versyxdigital/aldervast/releases/download/v1.14.41/Aldervast-1.14.41-server-windows.zip">Download <small>49 MB</small></a></div><div class="dl-how"><ol class="dl-steps"><li>Unzip it, open <b>server-windows</b> and double-click <b>start_server.bat</b>. The world is saved in <b>server_data</b> beside it.</li><li>Let UDP port 24650 in. In an administrator PowerShell:</li></ol><pre class="code"><code>New-NetFirewallRule -DisplayName &quot;Aldervast&quot; `
@@ -163,7 +163,7 @@ chmod +x ~/update-aldervast-server</code></pre>
         <a class="brand" href="index.html"><i class="mark" aria-hidden="true"></i><span>ALDERVAST</span></a>
         <p class="mt">An original fantasy online role-playing game, built in Godot 4.7. Current release 1.14.41. All names, places and stories here belong to Aldervast; no content comes from any other game.</p>
       </div>
-      <div><h4>Explore</h4><ul><li><a href="world.html">The World</a></li><li><a href="heroes.html">Heroes</a></li><li><a href="play.html">How it plays</a></li><li><a href="gallery.html">Gallery</a></li><li><a href="download.html">Download</a></li></ul></div>
+      <div><h4>Explore</h4><ul><li><a href="world.html">The World</a></li><li><a href="heroes.html">Heroes</a></li><li><a href="play.html">How it plays</a></li><li><a href="gallery.html">Gallery</a></li><li><a href="download.html">Download</a></li><li><a href="servers.html">Online servers</a></li></ul></div>
       <div><h4>Wiki</h4><ul><li><a href="wiki/index.html">All topics</a></li><li><a href="wiki/regions.html">Regions</a></li><li><a href="wiki/skills.html">Skills</a></li><li><a href="wiki/bosses.html">Bosses</a></li></ul></div>
       <div><h4>About</h4><ul><li><a href="changelog.html">Releases</a></li><li><a href="credits.html">Credits and licences</a></li></ul></div>
     </div>
