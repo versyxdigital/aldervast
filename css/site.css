@@ -560,7 +560,10 @@ footer ul { list-style: none; margin: 0; padding: 0; }
 footer li { margin: 5px 0; }
 footer a { color: var(--ink-2); text-decoration: none; }
 footer a:hover { color: var(--gold-3); }
-footer .fine { margin-top: 36px; padding-top: 18px; border-top: 1px solid var(--line); font-size: 0.85rem; }
+footer .fine { margin-top: 36px; padding-top: 18px; border-top: 1px solid var(--line); font-size: 0.85rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px 24px; }
+footer .fine .built { white-space: nowrap; }
+footer .fine .built a { color: var(--gold-3); }
+footer .fine .built a:hover { color: var(--ink); text-decoration: underline; }
 @media (max-width: 760px) { footer .cols { grid-template-columns: 1fr 1fr; } footer .cols > :first-child { grid-column: 1 / -1; } }
 
 /* Class cards */
