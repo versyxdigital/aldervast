@@ -44,7 +44,7 @@
   <div class="wrap narrow reveal">
     <div class="section-head"><span class="eyebrow">Under the hood</span><h2>How it is built</h2></div>
     <p>Aldervast is made in Godot 4.7 with GDScript. One authoritative server simulates the world: clients draw it, predict their own movement and send what they want to do. Every class, skill, item, monster, quest and dungeon is data rather than code, which is also how this site's wiki is generated.</p>
-    <p>Each release is checked by unit tests for the rules, simulated players on an in-process server, a smoke test that drives the real client, and a networked test with a dedicated server and two bot clients. Graphics settings, anti-aliasing among them, tune themselves on first play, and a built-in benchmark reports frame times. Switching to High or Ultra in play takes effect at once; temporal anti-aliasing, whose shaders are prepared while the game loads, starts at the next launch, with the faster smoothing until then, and the Anti-aliasing setting says so.</p>
+    <p>Each release is checked by unit tests for the rules, simulated players on an in-process server, a smoke test that drives the real client, and a networked test with a dedicated server and two bot clients. Graphics settings, anti-aliasing among them, tune themselves on first play, and a built-in benchmark reports frame times. Switching to High or Ultra in play takes effect at once; temporal anti-aliasing, whose shaders are prepared while the game loads, starts at the next launch, with the faster smoothing until then, and the Anti-aliasing setting says so. A monster, villager or place first seen far off appears a moment later, once it is ready to draw, rather than stopping the game while it is prepared, and the performance report names what had just come into view when a frame ran long.</p>
     <p>Models, textures and sounds are CC0 (KayKit, Quaternius, Poly Haven, ambientCG, OpenGameArt contributors) and the fonts are under the Open Font License. Many models are built from those sources by scripts in the project, and every item icon is rendered from the game's own models the same way. See <a href="credits.html">credits and licences</a>.</p>
   </div>
 </section>
@@ -55,7 +55,7 @@
     <div class="cols">
       <div>
         <a class="brand" href="index.html"><i class="mark" aria-hidden="true"></i><span>ALDERVAST</span></a>
-        <p class="mt">An original fantasy online role-playing game, built in Godot 4.7. Current release 1.14.69. All names, places and stories here belong to Aldervast; no content comes from any other game.</p>
+        <p class="mt">An original fantasy online role-playing game, built in Godot 4.7. Current release 1.14.70. All names, places and stories here belong to Aldervast; no content comes from any other game.</p>
       </div>
       <div><h4>Explore</h4><ul><li><a href="world.html">The World</a></li><li><a href="heroes.html">Heroes</a></li><li><a href="play.html">How it plays</a></li><li><a href="gallery.html">Gallery</a></li><li><a href="download.html">Download</a></li><li><a href="servers.html">Online servers</a></li></ul></div>
       <div><h4>Wiki</h4><ul><li><a href="wiki/index.html">All topics</a></li><li><a href="wiki/regions.html">Regions</a></li><li><a href="wiki/skills.html">Skills</a></li><li><a href="wiki/bosses.html">Bosses</a></li></ul></div>
