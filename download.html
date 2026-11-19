@@ -131,6 +131,10 @@ WantedBy=multi-user.target</code></pre>
     <p>Characters on a server are separate from Single Player ones. Anyone who knows the address can make an account, and the connection is not encrypted, so pick a password you use nowhere else. Logging in to the same account from a second PC drops the first.</p>
     <h3 id="vps-admins">5. Admins and test commands</h3>
     <p>Add <code>--admins=YourAccount</code> (your login name, not your hero's; several as <code>--admins=Name,Other</code>) to the end of the <code>ExecStart</code> line with <code>sudo systemctl edit --full aldervast</code>, then <code>sudo systemctl restart aldervast</code>. In the game, <code>/dbg</code> lists the <a href="wiki/getting-started.html#guide-test-commands">test commands</a>. Keep <code>--allow-debug</code> off: it gives them to everyone who joins.</p>
+    <h3 id="vps-password">A player forgot their password</h3>
+    <p>Sign-up asks for no email, so a player who forgets their password asks you, and you set a new one from the server's machine (1.14.93). It works with the server running or stopped. On the VPS:</p>
+    <pre class="code"><code>sudo aldervast-admin password Wren</code></pre>
+    <p>With no password after the account name it makes one up and prints it for you to pass on; give one after the name to choose it yourself. The update script below puts the command in place from 1.14.93. On another machine, run <code>./admin.sh password Wren</code> (Linux) or <code>admin.bat password Wren</code> (Windows) in the server's folder. Section 11 of the server guide has the details.</p>
     <h3 id="vps-update">6. Updating to a new release</h3>
     <p>The <a href="files/update-aldervast-server">update-aldervast-server</a> script checks the new build before it stops the server, keeps a dated copy of the saves and the old program, and puts the old program back if the new one does not stay running. Get it once:</p>
     <pre class="code"><code>wget -O ~/update-aldervast-server https://aldervast.online/files/update-aldervast-server
@@ -161,7 +165,7 @@ chmod +x ~/update-aldervast-server</code></pre>
     <div class="cols">
       <div>
         <a class="brand" href="index.html"><i class="mark" aria-hidden="true"></i><span>ALDERVAST</span></a>
-        <p class="mt">An original fantasy online role-playing game, built in Godot 4.7. Current release 1.14.92. All names, places and stories here belong to Aldervast; no content comes from any other game.</p>
+        <p class="mt">An original fantasy online role-playing game, built in Godot 4.7. Current release 1.14.93. All names, places and stories here belong to Aldervast; no content comes from any other game.</p>
       </div>
       <div><h4>Explore</h4><ul><li><a href="world.html">The World</a></li><li><a href="heroes.html">Heroes</a></li><li><a href="play.html">How it plays</a></li><li><a href="gallery.html">Gallery</a></li><li><a href="download.html">Download</a></li><li><a href="servers.html">Online servers</a></li></ul></div>
       <div><h4>Wiki</h4><ul><li><a href="wiki/index.html">All topics</a></li><li><a href="wiki/regions.html">Regions</a></li><li><a href="wiki/skills.html">Skills</a></li><li><a href="wiki/bosses.html">Bosses</a></li></ul></div>

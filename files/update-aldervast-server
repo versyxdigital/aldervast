@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # Update the Aldervast dedicated server on the VPS.
 #
-#   cd /tmp && wget https://github.com/versyxdigital/aldervast/releases/download/v1.14.41/Aldervast-1.14.41-server-linux.zip
-#   ~/update-aldervast-server --version=1.14.41
+#   cd /tmp && wget <the server-linux zip's link from https://aldervast.online/download.html>
+#   ~/update-aldervast-server --version=<version>
+#
+# From 1.14.93 it also puts the admin command in place: sudo aldervast-admin password <account>
 #
 # Looks for /tmp/Aldervast-<ver>-server-linux.zip (or its .part* pieces, which it joins),
 # also in your home folder. It checks the new build BEFORE stopping the server, keeps a dated
@@ -82,6 +84,7 @@ NEW="$STAGE/server-linux"
 [[ -d "$NEW" ]] || die "the zip has no server-linux/ folder (found: $(ls "$STAGE" | tr '\n' ' '))"
 [[ -f "$NEW/$BINARY" ]] || die "server-linux/$BINARY is missing from the zip"
 chmod +x "$NEW/$BINARY"
+[[ -f "$NEW/admin.sh" ]] && chmod +x "$NEW/admin.sh"
 file "$NEW/$BINARY" 2>/dev/null | grep -q 'x86-64' || echo "    (warning: couldn't confirm $BINARY is an x86-64 program)"
 say "New build $VERSION checked"
 
@@ -109,6 +112,20 @@ rm -rf "$PREV_DIR"
 mv "$NEW" "$SERVER_DIR"
 echo "$VERSION" > "$SERVER_DIR/VERSION"
 chown -R "$AV_USER:$AV_USER" "$AV_HOME"
+
+# ---- 5b. the admin command (1.14.93): sudo aldervast-admin password <account> [new password] ---------
+if [[ -f "$SERVER_DIR/admin.sh" ]]; then
+  cat > /usr/local/bin/aldervast-admin <<ADMIN
+#!/bin/sh
+# Aldervast server admin commands (put here by update-aldervast-server). With the server running or stopped:
+#   sudo aldervast-admin password <account> [new password]   (no password given: one is made up and printed)
+#   sudo aldervast-admin help
+if [ "\$(id -u)" -ne 0 ]; then exec sudo "\$0" "\$@"; fi
+exec sudo -u $AV_USER "$SERVER_DIR/admin.sh" --data-dir="$DATA_DIR" "\$@"
+ADMIN
+  chmod 755 /usr/local/bin/aldervast-admin
+  say "Admin command ready: sudo aldervast-admin password <account> [new password]"
+fi
 
 # ---- 6. start and make sure it stays up -----------------------------------------------------
 started_ok() {
