@@ -5,6 +5,8 @@
 #   ~/update-aldervast-server --version=<version>
 #
 # From 1.14.93 it also puts the admin command in place: sudo aldervast-admin password <account>
+# From 1.14.95 the server zip carries this script too: when the zip's copy differs, it is put in
+# /usr/bin (and over the copy you ran), and the update goes on with the new script.
 #
 # Looks for /tmp/Aldervast-<ver>-server-linux.zip (or its .part* pieces, which it joins),
 # also in your home folder. It checks the new build BEFORE stopping the server, keeps a dated
@@ -27,8 +29,11 @@ DATA_DIR="$AV_HOME/data"
 BINARY=aldervast_server.x86_64
 SETTLE_SECS=${SETTLE_SECS:-10}
 
+INSTALL_AT=${UPDATER_AT:-/usr/bin/update-aldervast-server}
+ADMIN_AT=${ADMIN_AT:-/usr/local/bin/aldervast-admin}
+
 VERSION="" ZIP="" KEEP_ZIP=0
-usage() { sed -n '2,18p' "$0" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'; }
 die()  { echo "ERROR: $*" >&2; exit 1; }
 say()  { echo "==> $*"; }
 
@@ -88,6 +93,30 @@ chmod +x "$NEW/$BINARY"
 file "$NEW/$BINARY" 2>/dev/null | grep -q 'x86-64' || echo "    (warning: couldn't confirm $BINARY is an x86-64 program)"
 say "New build $VERSION checked"
 
+# ---- 2b. this script itself (1.14.95): the zip's copy is put in place, and the update goes on with it -----
+SELF=$(readlink -f "$0")
+SELF_SUM=$(sha256sum < "$SELF")   # (before it is replaced below)
+NEW_UPDATER="$NEW/update-aldervast-server"
+if [[ -f "$NEW_UPDATER" ]]; then
+  chmod 755 "$NEW_UPDATER"
+  bash -n "$NEW_UPDATER" || die "the zip's update-aldervast-server does not read as a bash script; nothing was changed"
+  for at in "$INSTALL_AT" "$SELF"; do
+    if [[ -n "$at" ]] && ! cmp -s "$NEW_UPDATER" "$at"; then
+      install -m 755 "$NEW_UPDATER" "$at.new" && mv -f "$at.new" "$at"
+      say "$at is now the update script of $VERSION"
+    fi
+  done
+  if [[ -z "${AV_SELF_UPDATED:-}" && "$(sha256sum < "$NEW_UPDATER")" != "$SELF_SUM" ]]; then
+    say "Going on with the new update script"
+    ARGS=(--version="$VERSION" --zip="$ZIP")
+    (( KEEP_ZIP )) && ARGS+=(--keep-zip)
+    if (( ! KEEP_ZIP )) && (( ${#PARTS[@]} )); then rm -f "${PARTS[@]}"; fi   # (joined into $ZIP, which it removes)
+    cleanup_stage
+    trap - EXIT
+    exec env AV_SELF_UPDATED=1 "$INSTALL_AT" "${ARGS[@]}"
+  fi
+fi
+
 # ---- 3. stop the server (its ExecStop saves everything via the stop file) -------------------
 if systemctl is-active --quiet "$SERVICE"; then
   say "Stopping $SERVICE (saves first, up to 60 s)"
@@ -115,16 +144,18 @@ chown -R "$AV_USER:$AV_USER" "$AV_HOME"
 
 # ---- 5b. the admin command (1.14.93): sudo aldervast-admin password <account> [new password] ---------
 if [[ -f "$SERVER_DIR/admin.sh" ]]; then
-  cat > /usr/local/bin/aldervast-admin <<ADMIN
+  cat > "$ADMIN_AT" <<ADMIN
 #!/bin/sh
 # Aldervast server admin commands (put here by update-aldervast-server). With the server running or stopped:
 #   sudo aldervast-admin password <account> [new password]   (no password given: one is made up and printed)
+#   sudo aldervast-admin name <words>                        the server's name in the game's server browser
+#   sudo aldervast-admin motd <words>                        a line under it there (motd alone: none)
 #   sudo aldervast-admin help
 if [ "\$(id -u)" -ne 0 ]; then exec sudo "\$0" "\$@"; fi
 exec sudo -u $AV_USER "$SERVER_DIR/admin.sh" --data-dir="$DATA_DIR" "\$@"
 ADMIN
-  chmod 755 /usr/local/bin/aldervast-admin
-  say "Admin command ready: sudo aldervast-admin password <account> [new password]"
+  chmod 755 "$ADMIN_AT"
+  say "Admin command ready: sudo aldervast-admin help (a player's password, the server's name and line)"
 fi
 
 # ---- 6. start and make sure it stays up -----------------------------------------------------

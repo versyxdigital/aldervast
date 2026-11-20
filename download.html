@@ -125,7 +125,7 @@ WantedBy=multi-user.target</code></pre>
     <h3 id="vps-connect">4. How friends connect</h3>
     <ol>
       <li>Everyone plays the same version as the server (now 1.14.94).</li>
-      <li>Main menu &gt; <b>Join a Server</b>. Address: the VPS address, or a domain name pointed at it. Port: 24650.</li>
+      <li>Main menu &gt; <b>Join a Server</b>. Address: the VPS address, or a domain name pointed at it. Port: 24650. Once they have played on it, it stays in their <b>Browse servers</b> list.</li>
       <li>Account: 3 to 20 letters, digits or underscores; password: at least 4 characters. The first time, tick <b>Create this account if it doesn't exist</b>.</li>
     </ol>
     <p>Characters on a server are separate from Single Player ones. Anyone who knows the address can make an account, and the connection is not encrypted, so pick a password you use nowhere else. Logging in to the same account from a second PC drops the first.</p>
@@ -135,6 +135,11 @@ WantedBy=multi-user.target</code></pre>
     <p>Sign-up asks for no email, so a player who forgets their password asks you, and you set a new one from the server's machine (1.14.93). It works with the server running or stopped. On the VPS:</p>
     <pre class="code"><code>sudo aldervast-admin password Wren</code></pre>
     <p>With no password after the account name it makes one up and prints it for you to pass on; give one after the name to choose it yourself. The update script below puts the command in place from 1.14.93. On another machine, run <code>./admin.sh password Wren</code> (Linux) or <code>admin.bat password Wren</code> (Windows) in the server's folder. Section 11 of the server guide has the details.</p>
+    <h3 id="vps-name">Name your server</h3>
+    <p>The game's server browser (1.14.95) shows each server's name and a line under it. Set them from the server's machine:</p>
+    <pre class="code"><code>sudo aldervast-admin name The Lantern Hollow
+sudo aldervast-admin motd Fresh characters, friendly people, weekly resets</code></pre>
+    <p><code>motd</code> on its own clears the line. On another machine, run <code>./admin.sh name ...</code> (Linux) or <code>admin.bat name ...</code> (Windows) in the server's folder. Both are kept in <code>server.cfg</code> beside the saves, so updates keep them; the <code>--name=</code> launch option sets the name too. No new port is needed: the browser asks on the game's own UDP port, 24650.</p>
     <h3 id="vps-update">6. Updating to a new release</h3>
     <p>The <a href="files/update-aldervast-server">update-aldervast-server</a> script checks the new build before it stops the server, keeps a dated copy of the saves and the old program, and puts the old program back if the new one does not stay running. Get it once:</p>
     <pre class="code"><code>wget -O ~/update-aldervast-server https://aldervast.online/files/update-aldervast-server
@@ -142,6 +147,7 @@ chmod +x ~/update-aldervast-server</code></pre>
     <p>Then for each release (here 1.14.94):</p>
     <pre class="code"><code>cd /tmp &amp;&amp; wget https://github.com/versyxdigital/aldervast/releases/download/v1.14.94/Aldervast-1.14.94-server-linux.zip
 ~/update-aldervast-server --version=1.14.94</code></pre>
+    <p>From 1.14.95 the script also comes in the server zip and keeps itself up to date: each update puts the zip's copy in place and carries on with it. If yours is older than 1.14.95, get it once more as above; after that it looks after itself.</p>
     <p>The service file does not change between releases. Tell your friends to update their game too.</p>
     <h3 id="vps-backups">7. Backups</h3>
     <p>The hourly snapshots are on the same disk, so add a nightly archive kept for 14 days. Run <code>sudo mkdir -p /root/aldervast-backups</code> and <code>sudo crontab -e</code>, and add this line:</p>
@@ -165,7 +171,7 @@ chmod +x ~/update-aldervast-server</code></pre>
     <div class="cols">
       <div>
         <a class="brand" href="index.html"><i class="mark" aria-hidden="true"></i><span>ALDERVAST</span></a>
-        <p class="mt">An original fantasy online role-playing game, built in Godot 4.7. Current release 1.14.94. All names, places and stories here belong to Aldervast; no content comes from any other game.</p>
+        <p class="mt">An original fantasy online role-playing game, built in Godot 4.7. Current release 1.14.95. All names, places and stories here belong to Aldervast; no content comes from any other game.</p>
       </div>
       <div><h4>Explore</h4><ul><li><a href="world.html">The World</a></li><li><a href="heroes.html">Heroes</a></li><li><a href="play.html">How it plays</a></li><li><a href="gallery.html">Gallery</a></li><li><a href="download.html">Download</a></li><li><a href="servers.html">Online servers</a></li></ul></div>
       <div><h4>Wiki</h4><ul><li><a href="wiki/index.html">All topics</a></li><li><a href="wiki/regions.html">Regions</a></li><li><a href="wiki/skills.html">Skills</a></li><li><a href="wiki/bosses.html">Bosses</a></li></ul></div>
