@@ -212,3 +212,14 @@
   .pl-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; overflow: visible; }
   .pl-tab { padding: 10px 4px; font-size: 0.74rem; letter-spacing: 0.05em; justify-content: center; white-space: nowrap; }
 }
+/* the item finder above the paper doll */
+.pl-gear-side { display: grid; gap: 10px; align-content: start; min-width: 0; }
+.pl-find { position: relative; }
+.pl-find-in { width: 100%; box-sizing: border-box; }
+.pl-find-list { display: grid; gap: 4px; margin-top: 6px; }
+.pl-find-list:empty { display: none; }
+.pl-find-hit { display: flex; gap: 10px; align-items: center; text-align: left; padding: 6px 8px; background: var(--panel-2, rgba(255,255,255,.03)); border: 1px solid var(--line); border-radius: 8px; color: inherit; font: inherit; cursor: pointer; min-height: 44px; }
+.pl-find-hit:hover, .pl-find-hit:focus-visible { border-color: var(--gold); }
+.pl-find-hit > span { display: grid; min-width: 0; }
+.pl-find-name { font-weight: 600; }
+.pl-find-sub { color: var(--muted); font-size: .85em; }

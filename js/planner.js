@@ -361,9 +361,51 @@
           it ? h("span", { class: "pl-slot-item " + RCLS[it.rarity] }, itemName(it)) : h("span", { class: "pl-slot-item muted" }, "Empty"),
           it && it.sockets.length ? h("span", { class: "pl-slot-socks" }, it.sockets.map(function (s, i) { return [i > 0 ? h("span", { class: "pl-link" + (s.g === it.sockets[i - 1].g ? " on" : "") }) : null, h("span", { class: "pl-sock s-" + s.c + (it.gems[i] ? " full" : "") })]; })) : null)));
     });
-    wrap.appendChild(doll);
+    var side = h("div", { class: "pl-gear-side" }, finder(), doll);
+    wrap.appendChild(side);
     wrap.appendChild(itemEditor(openSlot, ctx));
     return wrap;
+  }
+  // find any base, unique or set piece by name and put it on in the slot it goes in
+  var findQuery = "", findList = null;
+  function findAll() {
+    if (findList) return findList;
+    findList = [];
+    D.bases.forEach(function (b) { if ((b.tags || []).indexOf("cosmetic") < 0) findList.push({ kind: "base", name: b.name, base: b.id, sub: classLabel(b.class) + ", level " + b.level, cls: "r-normal" }); });
+    D.uniques.forEach(function (u) { if (I.bases[u.base]) findList.push({ kind: "unique", id: u.id, name: u.name, base: u.base, sub: "Unique " + I.bases[u.base].name, cls: "r-unique" }); });
+    D.sets.forEach(function (st) { st.pieces.forEach(function (p) { if (I.bases[p.base]) findList.push({ kind: "set", id: st.id, name: p.name, base: p.base, sub: "Set piece of " + st.name, extra: st.name, cls: "r-set" }); }); });
+    return findList;
+  }
+  function slotsFor(baseId) { return SLOTS.map(function (s) { return s[0]; }).filter(function (sl) { return basesFor(sl).some(function (b) { return b.id === baseId; }); }); }
+  function finder() {
+    var list = h("div", { class: "pl-find-list", role: "listbox" });
+    function show() {
+      list.textContent = "";
+      var q = findQuery.trim().toLowerCase();
+      if (q.length < 2) return;
+      var hits = findAll().filter(function (e) { return e.name.toLowerCase().indexOf(q) >= 0 || (e.extra || "").toLowerCase().indexOf(q) >= 0; });
+      hits.sort(function (a, b) { return (a.name.toLowerCase().indexOf(q) === 0 ? 0 : 1) - (b.name.toLowerCase().indexOf(q) === 0 ? 0 : 1) || a.name.localeCompare(b.name); });
+      if (!hits.length) { list.appendChild(h("p", { class: "pl-note" }, "Nothing by that name.")); return; }
+      hits.slice(0, 12).forEach(function (e) {
+        list.appendChild(h("button", { class: "pl-find-hit", role: "option", onclick: function () { wear(e); } },
+          icon(e.base), h("span", null, h("span", { class: "pl-find-name " + e.cls }, e.name), h("span", { class: "pl-find-sub" }, e.sub))));
+      });
+      if (hits.length > 12) list.appendChild(h("p", { class: "pl-note" }, (hits.length - 12) + " more: keep typing to narrow it down."));
+    }
+    function wear(e) {
+      var sl = slotsFor(e.base);
+      if (!sl.length) { flash("That doesn't go in any slot."); return; }
+      var slot = sl.indexOf(openSlot) >= 0 ? openSlot : (sl.find(function (x) { return !S.eq[x]; }) || sl[0]);
+      var it = newItem(e.base, MAX_ILVL);
+      if (e.kind === "unique") setUnique(it, e.id);
+      else if (e.kind === "set") setSetPiece(it, e.id, e.base);
+      else it.rarity = 2;
+      S.eq[slot] = it; openSlot = slot; findQuery = ""; fitAffixes(it); changed();
+    }
+    var inp = h("input", { type: "search", class: "pl-find-in", placeholder: "Find an item: base, unique or set piece", value: findQuery, "aria-label": "Find an item",
+      oninput: function () { findQuery = this.value; show(); } });
+    show();
+    return h("div", { class: "pl-find" }, inp, list);
   }
   function itemEditor(slot, ctx) {
     var it = S.eq[slot], label = SLOTS.find(function (s) { return s[0] === slot; })[1];
