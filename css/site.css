@@ -133,6 +133,9 @@ small, .small { font-size: 0.9rem; }
   font-family: var(--display); font-size: 0.78rem; letter-spacing: 0.15em; text-transform: uppercase; font-weight: 600;
   transition: color 0.2s, background 0.2s, box-shadow 0.2s;
 }
+.nav-links a { white-space: nowrap; }
+@media (max-width: 1560px) { .nav-links a { padding: 8px 9px; letter-spacing: 0.1em; } }
+@media (max-width: 1340px) { .nav-links a { padding: 8px 7px; font-size: 0.72rem; letter-spacing: 0.06em; } .brand { letter-spacing: 0.16em; } }
 .nav-links a:hover { color: var(--gold-3); background: rgba(159, 220, 255, 0.07); }
 .nav-links a[aria-current="page"] { color: var(--gold-3); background: var(--pill); box-shadow: var(--glow-gold); }
 .nav-toggle { display: none; background: rgba(12, 24, 48, 0.6); border: 1px solid var(--line-2); color: var(--gold-2); width: 46px; height: 42px; border-radius: 10px; cursor: pointer; }
@@ -141,7 +144,7 @@ small, .small { font-size: 0.9rem; }
 .nav-open .nav-toggle span:nth-child(2) { opacity: 0; }
 .nav-open .nav-toggle span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
 
-@media (max-width: 980px) {
+@media (max-width: 1180px) {
   .nav-toggle { display: block; }
   .nav-links {
     position: fixed; top: var(--nav-h); left: 0; right: 0; height: calc(100vh - var(--nav-h)); height: calc(100dvh - var(--nav-h)); flex-direction: column; gap: 4px;
