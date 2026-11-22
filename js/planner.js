@@ -151,7 +151,7 @@
       if (x.im && I.imbues[x.im]) it.crafted = { id: x.im, mods: I.imbues[x.im].mods };
       if (x.wv && I.weaves[x.wv]) it.woven = { id: x.wv, mods: I.weaves[x.wv].mods };
       if (x.co != null && x.co >= 0 && D.corrupt[x.co]) { it.corrupted = true; it.corrupt_mods = [D.corrupt[x.co]]; }
-      (x.k || []).forEach(function (k) {
+      (x.k || []).slice(0, 6).forEach(function (k) {
         it.sockets.push({ c: "rgbw".indexOf(k[0]) >= 0 ? k[0] : "w", g: k[1] | 0 });
         it.gems.push(k.length > 2 && (I.skills[k[2]] || I.supports[k[2]]) ? { uid: uid(), kind: "gem", gem: k[2], support: !!k[3], level: Math.max(1, Math.min(30, k[4] | 0)), xp: 0, quality: Math.max(0, Math.min(20, k[5] | 0)) } : null);
       });
@@ -162,13 +162,17 @@
   function b64(bytes) { var s = ""; for (var i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]); return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); }
   function unb64(s) { s = s.replace(/-/g, "+").replace(/_/g, "/"); while (s.length % 4) s += "="; var bin = atob(s), out = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i); return out; }
   function streamBytes(bytes, stream) { return new Response(new Blob([bytes]).stream().pipeThrough(stream)).arrayBuffer().then(function (b) { return new Uint8Array(b); }); }
+  // SLOTS and SITUATIONS are named by place in a packed link: only ever add to the end of them
+  function codeOpts() { return { index: I, slots: SLOTS.map(function (x) { return x[0]; }), situations: SITUATIONS.map(function (x) { return x[0]; }) }; }
   function makeCode() {
+    if (window.AVCode && D.reg) { try { return Promise.resolve("p" + AVCode.pack(encodeState(), D, codeOpts())); } catch (e) { /* fall back to the long form */ } }
     var json = new TextEncoder().encode(JSON.stringify(encodeState()));
     if (typeof CompressionStream === "function") return streamBytes(json, new CompressionStream("deflate-raw")).then(function (z) { return "z" + b64(z); });
     return Promise.resolve("j" + b64(json));
   }
   function readCode(code) {
     try {
+      if (code[0] === "p") return Promise.resolve(decodeState(AVCode.unpack(code.slice(1), D, codeOpts())));
       if (code[0] === "j") return Promise.resolve(decodeState(JSON.parse(new TextDecoder().decode(unb64(code.slice(1))))));
       if (code[0] === "z" && typeof DecompressionStream === "function")
         return streamBytes(unb64(code.slice(1)), new DecompressionStream("deflate-raw")).then(function (b) { return decodeState(JSON.parse(new TextDecoder().decode(b))); }).catch(function () { return null; });
@@ -180,13 +184,14 @@
     clearTimeout(saveTimer);
     saveTimer = setTimeout(function () {
       try { localStorage.setItem("av-planner", JSON.stringify(encodeState())); } catch (e) { /* storage off */ }
-      makeCode().then(function (c) { try { history.replaceState(null, "", "#b=" + c); } catch (e) { /* file:// */ } });
+      makeCode().then(function (c) { try { history.replaceState(null, "", hashOf(c)); } catch (e) { /* file:// */ } });
     }, 250);
   }
+  function hashOf(c) { return c[0] === "p" ? "#" + c : "#b=" + c; }
   function copyLink() {
     makeCode().then(function (c) {
-      var url = location.href.split("#")[0] + "#b=" + c;
-      try { history.replaceState(null, "", "#b=" + c); } catch (e) { /* ignore */ }
+      var url = location.href.split("#")[0] + hashOf(c);
+      try { history.replaceState(null, "", hashOf(c)); } catch (e) { /* ignore */ }
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(function () { flash("Link copied. Anyone who opens it sees this build."); }, function () { prompt("Copy this link:", url); });
       else prompt("Copy this link:", url);
     });
@@ -889,7 +894,7 @@
 
   // ---------------------------------------------------------------- start
   function start() {
-    var hash = location.hash.match(/[#&]b=([A-Za-z0-9_-]+)/);
+    var hash = location.hash.match(/[#&]b=([A-Za-z0-9_-]+)/) || location.hash.match(/^#(p[A-Za-z0-9_-]*)$/);
     var p = hash ? readCode(hash[1]) : Promise.resolve(null);
     p.then(function (b) {
       if (!b) { try { b = decodeState(JSON.parse(localStorage.getItem("av-planner") || "null")); } catch (e) { b = null; } }
