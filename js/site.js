@@ -240,3 +240,13 @@
   var row = t.querySelector('[data-wk="' + (((wk % n) + n) % n) + '"]');
   if (row) row.classList.add('now');
 })();
+
+// Chat widget: a chat button at the bottom right of every page, which answers questions about the
+// game from this wiki. The widget itself, and the chatbot behind it, are served by
+// aldervast.versyxdigital.net (the aldervast-mcp project: public/widget.js and src/Web/Chat.php).
+(function () {
+  var s = document.createElement('script');
+  s.src = 'https://aldervast.versyxdigital.net/widget.js';
+  s.defer = true;
+  document.body.appendChild(s);
+})();
