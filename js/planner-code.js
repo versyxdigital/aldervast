@@ -81,6 +81,7 @@
       w.bit(!!x);
       if (x) item(w, x, D, I);
     });
+    w.bit(o.f); // added after the first links: a link without it reads 0 here
     return w.text();
   }
   function item(w, x, D, I) {
@@ -158,6 +159,7 @@
     var np = r.eg(4); prev = -1;
     for (var p = 0; p < np; p++) { prev += r.eg(2) + 1; o.p.push(prev); }
     opts.slots.forEach(function (slot) { if (r.bit()) { var x = readItem(r, D, opts.index); if (x) o.e[slot] = x; } });
+    o.f = r.bit();
     return o;
   }
   function readItem(r, D, I) {
